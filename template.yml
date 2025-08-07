@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AWS Serverless Spring Boot 2 API - spring.cloud::photo-blog
+
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage name for the deployment
+  DatasourceUsername:
+    Type: String
+    Default: DatasourceUsername
+    Description: Stage name for the deployment
+  DatasourceUrl:
+    Type: String
+    Default: DatasourceUrl
+    Description: Stage name for the deployment
+  DatasourcePassword:
+    Type: String
+    Default: DatasourcePassword
+    Description: Stage name for the deployment
+  JwtSecret:
+    Type: String
+    Default: randomstring
+
+
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 2048
+    Runtime: java21
+    Environment:
+      Variables:
+        SPRING_PROFILES_ACTIVE: !Ref Stage
+        DATASOURCE_USERNAME: !Ref DatasourceUsername
+        DATASOURCE_URL: !Ref DatasourceUrl
+        DATASOURCE_PASSWORD: !Ref DatasourcePassword
+
+Resources:
+  PhotoBlogDependenciesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: photo-blog-dependencies
+      ContentUri: layers/spring-layer/
+      CompatibleRuntimes:
+        - java21
+      RetentionPolicy: Retain
+
+  PhotoBlogFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: spring.cloud.StreamLambdaHandler::handleRequest
+      Environment:
+        Variables:
+          JWT_SECRET: !Ref JwtSecret
+      CodeUri: .
+      Policies: AWSLambdaBasicExecutionRole
+      Events:
+        ProxyResource:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: any
+
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "${AWS::StackName}-api"
+      StageName: !Ref Stage
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
+Outputs:
+  PhotoBlogApi:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+    Export:
+      Name: PhotoBlogApi
