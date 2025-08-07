@@ -28,7 +28,7 @@ jobs:
 
       - name: Build layer dependencies
         run: |
-          cd layers/spring-boot-layer
+          cd layers/spring-layer
           mvn clean package
           cd ../..
 
