@@ -69,7 +69,7 @@ Resources:
       ClientName: !Sub "${AWS::StackName}-client"
       GenerateSecret: false
       ExplicitAuthFlows:
-        - ADMIN_NO_SRP_AUTH
+        - ALLOW_ADMIN_USER_PASSWORD_AUTH
         - ALLOW_USER_PASSWORD_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
       TokenValidityUnits:

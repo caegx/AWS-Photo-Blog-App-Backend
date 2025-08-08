@@ -72,7 +72,7 @@ public class CognitoService {
                                 .build(),
                         AttributeType.builder()
                                 .name("email_verified")
-                                .value(request.email())
+                                .value("true")
                                 .build()
                 )
                 .temporaryPassword(request.password())
