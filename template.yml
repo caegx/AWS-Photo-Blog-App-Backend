@@ -60,6 +60,7 @@ Resources:
         ProxyResource:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGateway
             Path: /{proxy+}
             Method: any
 
