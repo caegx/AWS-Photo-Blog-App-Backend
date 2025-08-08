@@ -8,21 +8,6 @@ Parameters:
     Type: String
     Default: dev
     Description: Stage name for the deployment
-  DatasourceUsername:
-    Type: String
-    Default: DatasourceUsername
-    Description: Stage name for the deployment
-  DatasourceUrl:
-    Type: String
-    Default: DatasourceUrl
-    Description: Stage name for the deployment
-  DatasourcePassword:
-    Type: String
-    Default: DatasourcePassword
-    Description: Stage name for the deployment
-  JwtSecret:
-    Type: String
-    Default: randomstring
 
 
 Globals:
@@ -36,9 +21,68 @@ Globals:
         DATASOURCE_USERNAME: !Ref DatasourceUsername
         DATASOURCE_URL: !Ref DatasourceUrl
         DATASOURCE_PASSWORD: !Ref DatasourcePassword
-        JWT_SECRET: !Ref JwtSecret
+        COGNITO_USER_POOL_ID: !Ref PhotoBlogUserPool
+        COGNITO_CLIENT_ID: !Ref PhotoBlogUserPoolClient
+        COGNITO_REGION: !Ref AWS::Region
 
 Resources:
+  PhotoBlogUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "${AWS::StackName}-user-pool"
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Required: true
+          Mutable: true
+        - Name: name
+          AttributeDataType: String
+          Required: true
+          Mutable: true
+
+  PhotoBlogUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref PhotoBlogUserPool
+      ClientName: !Sub "${AWS::StackName}-client"
+      GenerateSecret: false
+      ExplicitAuthFlows:
+        - ADMIN_NO_SRP_AUTH
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+      RefreshTokenValidity: 30
+
+  PhotoBlogUserGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      UserPoolId: !Ref PhotoBlogUserPool
+      GroupName: USER
+      Description: Regular users group
+
+    PhotoBlogAdminGroup:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        UserPoolId: !Ref PhotoBlogUserPool
+        GroupName: ADMIN
+        Description: Admin users group
+
   PhotoBlogDependenciesLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
@@ -55,7 +99,19 @@ Resources:
       Layers:
         - !Ref PhotoBlogDependenciesLayer
       CodeUri: .
-      Policies: AWSLambdaBasicExecutionRole
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - cognito-idp:AdminCreateUser
+                - cognito-idp:AdminSetUserPassword
+                - cognito-idp:AdminAddUserToGroup
+                - cognito-idp:AdminGetUser
+                - cognito-idp:AdminInitiateAuth
+                - cognito-idp:AdminRespondToAuthChallenge
+              Resource: !GetAtt PhotoBlogUserPool.Arn
       Events:
         ProxyResource:
           Type: Api
@@ -80,3 +136,15 @@ Outputs:
     Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
     Export:
       Name: PhotoBlogApi
+
+  CognitoUserPoolId:
+    Description: Cognito User Pool ID
+    Value: !Ref PhotoBlogUserPool
+    Export:
+      Name: PhotoBlogUserPoolId
+
+  CognitoClientId:
+    Description: Cognito User Pool Client ID
+    Value: !Ref PhotoBlogUserPoolClient
+    Export:
+      Name: PhotoBlogClientId

@@ -1,21 +1,26 @@
 package spring.cloud.config;
 
-import io.jsonwebtoken.security.Keys;
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.crypto.SecretKey;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 
 @Configuration
-@ConfigurationProperties(prefix = "spring.jwt")
-@Data
 public class JwtConfig {
-    private String secret;
-    private int accessTokenExpiration;
-    private int refreshTokenExpiration;
 
-    public SecretKey getSecretKey() {
-        return Keys.hmacShaKeyFor(secret.getBytes());
+    @Value("${cognito.region}")
+    private String region;
+
+    @Value("${cognito.user-pool-id}")
+    private String userPoolId;
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        String jwkSetUri = String.format(
+                "https://cognito-idp.%s.amazonaws.com/%s/.well-known/jwks.json",
+                region, userPoolId
+        );
+        return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
     }
 }

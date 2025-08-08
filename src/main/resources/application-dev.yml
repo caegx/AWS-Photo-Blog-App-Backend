@@ -3,11 +3,11 @@ spring:
     url: ${DATASOURCE_URL}
     username: ${DATASOURCE_USERNAME}
     password: ${DATASOURCE_PASSWORD}
-  jwt:
-    secret: ${JWT_SECRET}
-    accessTokenExpiration: 300
-    refreshTokenExpiration: 604800
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+cognito:
+  user-pool-id: ${COGNITO_USER_POOL_ID}
+  client-id: ${COGNITO_CLIENT_ID}
+  region: ${COGNITO_REGION}
