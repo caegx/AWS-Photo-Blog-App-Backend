@@ -7,3 +7,7 @@ spring:
     secret: ${JWT_SECRET}
     accessTokenExpiration: 300
     refreshTokenExpiration: 604800
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
