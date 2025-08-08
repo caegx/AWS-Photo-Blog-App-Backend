@@ -8,18 +8,18 @@ Parameters:
     Type: String
     Default: dev
     Description: Stage name for the deployment
-    DatasourceUsername:
-      Type: String
-      Default: DatasourceUsername
-      Description: Stage name for the deployment
-      DatasourceUrl:
-        Type: String
-        Default: DatasourceUrl
-        Description: Stage name for the deployment
-      DatasourcePassword:
-        Type: String
-        Default: DatasourcePassword
-        Description: Stage name for the deployment
+  DatasourceUsername:
+    Type: String
+    Default: DatasourceUsername
+    Description: Stage name for the deployment
+  DatasourceUrl:
+    Type: String
+    Default: DatasourceUrl
+    Description: Stage name for the deployment
+  DatasourcePassword:
+    Type: String
+    Default: DatasourcePassword
+    Description: Stage name for the deployment
 
 Globals:
   Function:
