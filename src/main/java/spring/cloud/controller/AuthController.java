@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import software.amazon.awssdk.core.exception.SdkClientException;
 import spring.cloud.dtos.JwtResponse;
 import spring.cloud.dtos.LoginRequest;
 import spring.cloud.service.CognitoService;
@@ -46,6 +47,10 @@ public class AuthController {
 
         var authResult = cognitoService.refreshToken(refreshToken);
         return ResponseEntity.ok(new JwtResponse(authResult.accessToken()));
+    }
 
+    @ExceptionHandler(SdkClientException.class)
+    public ResponseEntity<Void> handleSdkClientException() {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }

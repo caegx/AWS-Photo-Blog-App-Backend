@@ -2,6 +2,7 @@ package spring.cloud.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
@@ -12,6 +13,8 @@ import spring.cloud.dtos.RegisterUserRequest;
 import spring.cloud.dtos.UserRoleDto;
 import spring.cloud.entities.Role;
 import spring.cloud.exceptions.InvalidOperationException;
+import spring.cloud.mappers.UserMapper;
+import spring.cloud.repositories.UserRepository;
 
 import java.util.Map;
 
@@ -20,43 +23,40 @@ import java.util.Map;
 public class CognitoService {
     private final CognitoIdentityProviderClient cognitoClient;
     private final CognitoConfig cognitoConfig;
+    private final UserMapper userMapper;
+    private final UserRepository userRepository;
 
     public AuthenticationResultType login(LoginRequest request) {
-        try {
-            var authRequest = AdminInitiateAuthRequest.builder()
-                    .userPoolId(cognitoConfig.getUserPoolId())
-                    .clientId(cognitoConfig.getClientId())
-                    .authFlow(AuthFlowType.ADMIN_NO_SRP_AUTH)
-                    .authParameters(Map.of(
-                            "USERNAME", request.email(),
-                            "PASSWORD", request.password()
-                    ))
-                    .build();
+        var authRequest = AdminInitiateAuthRequest.builder()
+                .userPoolId(cognitoConfig.getUserPoolId())
+                .clientId(cognitoConfig.getClientId())
+                .authFlow(AuthFlowType.ADMIN_NO_SRP_AUTH)
+                .authParameters(Map.of(
+                        "USERNAME", request.email(),
+                        "PASSWORD", request.password()
+                ))
+                .build();
 
-            var response = cognitoClient.adminInitiateAuth(authRequest);
+        var response = cognitoClient.adminInitiateAuth(authRequest);
 
-            return response.authenticationResult();
-        } catch (AwsServiceException | SdkClientException e) {
-            throw new InvalidOperationException(e.getMessage());
-        }
+        return response.authenticationResult();
+
     }
 
     public AuthenticationResultType refreshToken(String refreshToken) {
-        try {
-            var authRequest = AdminInitiateAuthRequest.builder()
-                    .userPoolId(cognitoConfig.getUserPoolId())
-                    .clientId(cognitoConfig.getClientId())
-                    .authFlow(AuthFlowType.REFRESH_TOKEN_AUTH)
-                    .authParameters(Map.of("REFRESH_TOKEN", refreshToken))
-                    .build();
+        var authRequest = AdminInitiateAuthRequest.builder()
+                .userPoolId(cognitoConfig.getUserPoolId())
+                .clientId(cognitoConfig.getClientId())
+                .authFlow(AuthFlowType.REFRESH_TOKEN_AUTH)
+                .authParameters(Map.of("REFRESH_TOKEN", refreshToken))
+                .build();
 
-            var response = cognitoClient.adminInitiateAuth(authRequest);
-            return response.authenticationResult();
-        } catch (AwsServiceException | SdkClientException e) {
-            throw new InvalidOperationException(e.getMessage());
-        }
+        var response = cognitoClient.adminInitiateAuth(authRequest);
+        return response.authenticationResult();
+
     }
 
+    @Transactional
     public UserRoleDto createUser(RegisterUserRequest request) {
         var createUserRequest = AdminCreateUserRequest.builder()
                 .userPoolId(cognitoConfig.getUserPoolId())
@@ -98,6 +98,9 @@ public class CognitoService {
                 .build();
 
         cognitoClient.adminAddUserToGroup(addToGroupRequest);
+
+        var user = userMapper.toUser(request);
+        userRepository.save(user);
 
         return new UserRoleDto(request.name(), request.email(), Role.USER);
     }
