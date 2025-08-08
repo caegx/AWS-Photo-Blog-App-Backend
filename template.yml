@@ -36,6 +36,7 @@ Globals:
         DATASOURCE_USERNAME: !Ref DatasourceUsername
         DATASOURCE_URL: !Ref DatasourceUrl
         DATASOURCE_PASSWORD: !Ref DatasourcePassword
+        JWT_SECRET: !Ref JwtSecret
 
 Resources:
   PhotoBlogDependenciesLayer:
@@ -51,9 +52,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: spring.cloud.StreamLambdaHandler::handleRequest
-      Environment:
-        Variables:
-          JWT_SECRET: !Ref JwtSecret
+      Layers:
+        - !Ref PhotoBlogDependenciesLayer
       CodeUri: .
       Policies: AWSLambdaBasicExecutionRole
       Events:
