@@ -76,12 +76,12 @@ Resources:
       GroupName: USER
       Description: Regular users group
 
-    PhotoBlogAdminGroup:
-      Type: AWS::Cognito::UserPoolGroup
-      Properties:
-        UserPoolId: !Ref PhotoBlogUserPool
-        GroupName: ADMIN
-        Description: Admin users group
+  PhotoBlogAdminGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      UserPoolId: !Ref PhotoBlogUserPool
+      GroupName: ADMIN
+      Description: Admin users group
 
   PhotoBlogDependenciesLayer:
     Type: AWS::Serverless::LayerVersion
