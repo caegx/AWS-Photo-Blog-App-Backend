@@ -123,6 +123,9 @@ Resources:
                 - cognito-idp:AdminInitiateAuth
                 - cognito-idp:AdminRespondToAuthChallenge
               Resource: !GetAtt PhotoBlogUserPool.Arn
+      SnapStart:
+        ApplyOn: PublishedVersions
+      AutoPublishAlias: live
       Events:
         ProxyResource:
           Type: Api
