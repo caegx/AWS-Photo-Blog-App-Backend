@@ -1,10 +1,8 @@
-package spring.cloud.service;
+package spring.cloud.services;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import software.amazon.awssdk.awscore.exception.AwsServiceException;
-import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.*;
 import spring.cloud.config.CognitoConfig;
@@ -12,7 +10,6 @@ import spring.cloud.dtos.LoginRequest;
 import spring.cloud.dtos.RegisterUserRequest;
 import spring.cloud.dtos.UserRoleDto;
 import spring.cloud.entities.Role;
-import spring.cloud.exceptions.InvalidOperationException;
 import spring.cloud.mappers.UserMapper;
 import spring.cloud.repositories.UserRepository;
 

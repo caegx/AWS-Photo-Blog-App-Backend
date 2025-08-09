@@ -1,4 +1,4 @@
-package spring.cloud.controller;
+package spring.cloud.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;

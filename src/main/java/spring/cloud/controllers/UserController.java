@@ -1,4 +1,4 @@
-package spring.cloud.controller;
+package spring.cloud.controllers;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import spring.cloud.dtos.RegisterUserRequest;
 import spring.cloud.dtos.UserRoleDto;
-import spring.cloud.service.CognitoService;
+import spring.cloud.services.CognitoService;
 
 @RestController
 @AllArgsConstructor

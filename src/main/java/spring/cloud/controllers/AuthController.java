@@ -1,4 +1,4 @@
-package spring.cloud.controller;
+package spring.cloud.controllers;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import spring.cloud.dtos.JwtResponse;
 import spring.cloud.dtos.LoginRequest;
-import spring.cloud.service.CognitoService;
+import spring.cloud.services.CognitoService;
 
 @RestController
 @AllArgsConstructor
