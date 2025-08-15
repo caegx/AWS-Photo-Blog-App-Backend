@@ -68,6 +68,6 @@ jobs:
               DatasourceUsername="${{ secrets.DATASOURCE_USERNAME }}" \
               DatasourceUrl="${{ secrets.DATASOURCE_URL }}" \
               DatasourcePassword="${{ secrets.DATASOURCE_PASSWORD }}" \
-              ImageKitUrlEndpoint="${{ secrets.IMAGEKIT_URL_ENDPOINT }} \
-              ImageKitPrivateKey="${{ secrets.IMAGEKIT_PRIVATE_KEY }} \
-              ImageKitPublicKey="${{ secrets.IMAGEKIT_PUBLIC_KEY }}
+              ImageKitUrlEndpoint="${{ secrets.IMAGEKIT_URL_ENDPOINT }}" \
+              ImageKitPrivateKey="${{ secrets.IMAGEKIT_PRIVATE_KEY }}" \
+              ImageKitPublicKey="${{ secrets.IMAGEKIT_PUBLIC_KEY }}"
