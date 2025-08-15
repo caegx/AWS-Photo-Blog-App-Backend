@@ -7,7 +7,18 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-cognito:
-  user-pool-id: ${COGNITO_USER_POOL_ID}
-  client-id: ${COGNITO_CLIENT_ID}
-  region: ${COGNITO_REGION}
+
+aws:
+  cognito:
+    user-pool-id: ${COGNITO_USER_POOL_ID}
+    client-id: ${COGNITO_CLIENT_ID}
+    region: ${REGION}
+  s3:
+    staging-bucket-name: ${STAGING_IMAGE_BUCKET}
+    processed-bucket-name: ${PROCESSED_IMAGE_BUCKET}
+    region: ${REGION}
+
+imagekit:
+  url-endpoint: ${IMAGEKIT_URL_ENDPOINT}
+  private-key: ${IMAGEKIT_PRIVATE_KEY}
+  public-key: ${IMAGEKIT_PUBLIC_KEY}

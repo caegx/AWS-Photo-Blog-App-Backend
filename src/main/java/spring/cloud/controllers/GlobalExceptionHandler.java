@@ -9,6 +9,7 @@ import software.amazon.awssdk.core.exception.SdkClientException;
 import spring.cloud.exceptions.InvalidOperationException;
 import spring.cloud.exceptions.dtos.ExceptionResponse;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +26,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidOperationException.class)
     public ResponseEntity<ExceptionResponse> handleException(InvalidOperationException exception) {
+        return ResponseEntity.badRequest().body(new ExceptionResponse(exception.getMessage()));
+    }
+
+    @ExceptionHandler(IOException.class)
+    public ResponseEntity<ExceptionResponse> handleException(IOException exception) {
         return ResponseEntity.badRequest().body(new ExceptionResponse(exception.getMessage()));
     }
 

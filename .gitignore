@@ -39,3 +39,6 @@ build/
 
 .env
 samconfig.toml
+.aws-sam
+layers/spring-layer/java/lib/**
+

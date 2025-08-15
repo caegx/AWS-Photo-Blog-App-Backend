@@ -2,7 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: AWS Serverless Spring Boot 2 API - spring.cloud::photo-blog
 
-
 Parameters:
   Stage:
     Type: String
@@ -20,6 +19,15 @@ Parameters:
     Type: String
     Default: DatasourcePassword
     Description: Stage name for the deployment
+  ImageKitUrlEndpoint:
+    Type: String
+    Default: ImagekitUrlEndpoint
+  ImageKitPrivateKey:
+    Type: String
+    Default: ImageKitPrivateKey
+  ImageKitPublicKey:
+    Type: String
+    Default: ImageKitPublicKey
 
 Globals:
   Function:
@@ -34,9 +42,29 @@ Globals:
         DATASOURCE_PASSWORD: !Ref DatasourcePassword
         COGNITO_USER_POOL_ID: !Ref PhotoBlogUserPool
         COGNITO_CLIENT_ID: !Ref PhotoBlogUserPoolClient
-        COGNITO_REGION: !Ref AWS::Region
+        REGION: !Ref AWS::Region
+        IMAGEKIT_URL_ENDPOINT: !Ref ImageKitUrlEndpoint
+        IMAGEKIT_PRIVATE_KEY: !Ref ImageKitPrivateKey
+        IMAGEKIT_PUBLIC_KEY: !Ref ImageKitPublicKey
 
 Resources:
+  ProcessedImageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${Stage}-photoblog-processed-${AWS::AccountId}-${AWS::Region}"
+      VersioningConfiguration:
+        Status: Enabled
+
+  StagingImageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${Stage}-photoblog-staging-${AWS::AccountId}-${AWS::Region}"
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteAfter1Day
+            Status: Enabled
+            ExpirationInDays: 1
+
   PhotoBlogUserPool:
     Type: AWS::Cognito::UserPool
     Properties:
@@ -103,6 +131,20 @@ Resources:
         - java21
       RetentionPolicy: Retain
 
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub "${AWS::StackName}-api"
+      StageName: !Ref Stage
+      BinaryMediaTypes:
+        - "multipart/form-data"
+        - "image/*"
+        - "application/octet-stream"
+      Cors:
+        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+
   PhotoBlogFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -110,8 +152,16 @@ Resources:
       Layers:
         - !Ref PhotoBlogDependenciesLayer
       CodeUri: .
+      Environment:
+        Variables:
+          STAGING_IMAGE_BUCKET: !Ref StagingImageBucket
+          PROCESSED_IMAGE_BUCKET: !Ref ProcessedImageBucket
       Policies:
         - AWSLambdaBasicExecutionRole
+        - S3CrudPolicy:
+            BucketName: !Ref StagingImageBucket
+        - S3CrudPolicy:
+            BucketName: !Ref ProcessedImageBucket
         - Version: '2012-10-17'
           Statement:
             - Effect: Allow
@@ -134,16 +184,6 @@ Resources:
             Path: /{proxy+}
             Method: any
 
-  ApiGateway:
-    Type: AWS::Serverless::Api
-    Properties:
-      Name: !Sub "${AWS::StackName}-api"
-      StageName: !Ref Stage
-      Cors:
-        AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
-        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-        AllowOrigin: "'*'"
-
 Outputs:
   PhotoBlogApi:
     Description: API Gateway endpoint URL
@@ -162,3 +202,8 @@ Outputs:
     Value: !Ref PhotoBlogUserPoolClient
     Export:
       Name: PhotoBlogClientId
+
+  StagingBucketName:
+    Value: !Ref StagingImageBucket
+    Export:
+      Name: StagingImageBucketName

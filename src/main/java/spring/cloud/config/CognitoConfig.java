@@ -9,7 +9,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 
 @Configuration
-@ConfigurationProperties(prefix = "cognito")
+@ConfigurationProperties(prefix = "aws.cognito")
 @Data
 public class CognitoConfig {
     private String userPoolId;

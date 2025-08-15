@@ -9,10 +9,10 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 @Configuration
 public class JwtConfig {
 
-    @Value("${cognito.region}")
+    @Value("${aws.cognito.region}")
     private String region;
 
-    @Value("${cognito.user-pool-id}")
+    @Value("${aws.cognito.user-pool-id}")
     private String userPoolId;
 
     @Bean
