@@ -1,4 +1,4 @@
-package spring.cloud.dtos;
+package spring.cloud.dtos.images;
 
 public record WatermarkResponse(
         String waterMarkedUrl,

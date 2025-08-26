@@ -166,6 +166,13 @@ Resources:
           Statement:
             - Effect: Allow
               Action:
+                - s3:ListBucketVersions
+                - s3:DeleteObjectVersion
+              Resource:
+                - !Sub "${ProcessedImageBucket.Arn}/*"
+                - !GetAtt ProcessedImageBucket.Arn
+            - Effect: Allow
+              Action:
                 - cognito-idp:AdminCreateUser
                 - cognito-idp:AdminSetUserPassword
                 - cognito-idp:AdminAddUserToGroup
@@ -202,8 +209,3 @@ Outputs:
     Value: !Ref PhotoBlogUserPoolClient
     Export:
       Name: PhotoBlogClientId
-
-  StagingBucketName:
-    Value: !Ref StagingImageBucket
-    Export:
-      Name: StagingImageBucketName

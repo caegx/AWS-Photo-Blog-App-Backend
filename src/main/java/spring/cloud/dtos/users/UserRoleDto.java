@@ -1,4 +1,4 @@
-package spring.cloud.dtos;
+package spring.cloud.dtos.users;
 
 import spring.cloud.entities.Role;
 

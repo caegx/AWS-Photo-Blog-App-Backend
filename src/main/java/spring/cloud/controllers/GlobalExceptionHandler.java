@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import spring.cloud.exceptions.InvalidOperationException;
+import spring.cloud.exceptions.ResourceNotFoundException;
 import spring.cloud.exceptions.dtos.ExceptionResponse;
 
 import java.io.IOException;
@@ -27,6 +28,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidOperationException.class)
     public ResponseEntity<ExceptionResponse> handleException(InvalidOperationException exception) {
         return ResponseEntity.badRequest().body(new ExceptionResponse(exception.getMessage()));
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleException(ResourceNotFoundException exception) {
+        return ResponseEntity.status(exception.getStatus()).body(new ExceptionResponse(exception.getMessage()));
     }
 
     @ExceptionHandler(IOException.class)

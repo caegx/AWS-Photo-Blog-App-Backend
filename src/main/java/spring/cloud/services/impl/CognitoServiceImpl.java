@@ -1,15 +1,20 @@
 package spring.cloud.services.impl;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.services.cognitoidentityprovider.CognitoIdentityProviderClient;
 import software.amazon.awssdk.services.cognitoidentityprovider.model.*;
 import spring.cloud.config.CognitoConfig;
-import spring.cloud.dtos.LoginRequest;
-import spring.cloud.dtos.RegisterUserRequest;
-import spring.cloud.dtos.UserRoleDto;
+import spring.cloud.dtos.users.LoginRequest;
+import spring.cloud.dtos.users.RegisterUserRequest;
+import spring.cloud.dtos.users.UserRoleDto;
 import spring.cloud.entities.Role;
+import spring.cloud.entities.User;
+import spring.cloud.exceptions.ResourceNotFoundException;
 import spring.cloud.mappers.UserMapper;
 import spring.cloud.repositories.UserRepository;
 import spring.cloud.services.CognitoService;
@@ -18,6 +23,7 @@ import java.util.Map;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class CognitoServiceImpl implements CognitoService {
     private final CognitoIdentityProviderClient cognitoClient;
     private final CognitoConfig cognitoConfig;
@@ -82,6 +88,7 @@ public class CognitoServiceImpl implements CognitoService {
 
         var createResponse = cognitoClient.adminCreateUser(createUserRequest);
         String userId = createResponse.user().username();
+        log.info("Created user's sub: {}", userId);
 
         var setPasswordRequest = AdminSetUserPasswordRequest.builder()
                 .userPoolId(cognitoConfig.getUserPoolId())
@@ -101,8 +108,19 @@ public class CognitoServiceImpl implements CognitoService {
         cognitoClient.adminAddUserToGroup(addToGroupRequest);
 
         var user = userMapper.toUser(request);
+        user.setCognitoUserId(userId);
         userRepository.save(user);
 
         return new UserRoleDto(request.name(), request.email(), Role.USER);
+    }
+
+    @Override
+    public User getCurrentUser() {
+        var cognitoUserId = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+
+        return userRepository.findByCognitoUserId(cognitoUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found", HttpStatus.FORBIDDEN));
     }
 }

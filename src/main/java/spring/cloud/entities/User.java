@@ -16,17 +16,12 @@ public class User {
     @Column(name = "id")
     private Long id;
 
+    @Column(unique = true, nullable = false)
+    private String cognitoUserId;
+
     @Column(name = "name")
     private String name;
 
     @Column(name = "email")
     private String email;
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "(" +
-                "id = " + id + ", " +
-                "name = " + name + ", " +
-                "email = " + email + ")";
-    }
 }

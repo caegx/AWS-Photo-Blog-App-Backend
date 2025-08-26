@@ -6,13 +6,13 @@ import io.imagekit.sdk.models.results.Result;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import spring.cloud.config.ImagekitConfig;
-import spring.cloud.dtos.WatermarkRequest;
+import spring.cloud.dtos.images.WatermarkRequest;
 import spring.cloud.exceptions.InvalidOperationException;
-import spring.cloud.services.WatermarkService;
+import spring.cloud.services.ImageKitService;
 
 @Service
 @AllArgsConstructor
-public class ImageKitServiceImpl implements WatermarkService {
+public class ImageKitServiceImpl implements ImageKitService {
     private final ImageKit imageKit;
     private final ImagekitConfig imagekitConfig;
 

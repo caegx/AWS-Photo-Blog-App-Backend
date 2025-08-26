@@ -8,8 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import software.amazon.awssdk.awscore.exception.AwsServiceException;
-import spring.cloud.dtos.JwtResponse;
-import spring.cloud.dtos.LoginRequest;
+import spring.cloud.dtos.users.JwtResponse;
+import spring.cloud.dtos.users.LoginRequest;
 import spring.cloud.services.CognitoService;
 
 @RestController

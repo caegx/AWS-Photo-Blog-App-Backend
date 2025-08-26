@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import spring.cloud.dtos.RegisterUserRequest;
-import spring.cloud.dtos.UserRoleDto;
+import spring.cloud.dtos.users.RegisterUserRequest;
+import spring.cloud.dtos.users.UserRoleDto;
 import spring.cloud.services.CognitoService;
 
 @RestController

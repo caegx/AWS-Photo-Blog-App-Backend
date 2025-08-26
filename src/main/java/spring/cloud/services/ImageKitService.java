@@ -1,7 +1,7 @@
 package spring.cloud.services;
 
-import spring.cloud.dtos.WatermarkRequest;
+import spring.cloud.dtos.images.WatermarkRequest;
 
-public interface WatermarkService {
+public interface ImageKitService {
     String addWatermark(String s3ImageUrl, WatermarkRequest request);
 }

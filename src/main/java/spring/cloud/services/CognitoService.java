@@ -1,9 +1,10 @@
 package spring.cloud.services;
 
 import software.amazon.awssdk.services.cognitoidentityprovider.model.AuthenticationResultType;
-import spring.cloud.dtos.LoginRequest;
-import spring.cloud.dtos.RegisterUserRequest;
-import spring.cloud.dtos.UserRoleDto;
+import spring.cloud.dtos.users.LoginRequest;
+import spring.cloud.dtos.users.RegisterUserRequest;
+import spring.cloud.dtos.users.UserRoleDto;
+import spring.cloud.entities.User;
 
 public interface CognitoService {
     AuthenticationResultType login(LoginRequest request);
@@ -11,4 +12,6 @@ public interface CognitoService {
     AuthenticationResultType refreshToken(String refreshToken);
 
     UserRoleDto createUser(RegisterUserRequest request);
+
+    User getCurrentUser();
 }
